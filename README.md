@@ -28,7 +28,7 @@ steps:
 
   - name: Get AAD Secret
     id: aad-secret
-    uses: LanceMcCarthy/akeyless-aad-secret@v1.0.0
+    uses: LanceMcCarthy/akeyless-aad-secret@v1
     with:
       akeyless-secret-path: '/DevTools/live-azure-ad'
       akeyless-access-id: '${{ secrets.AKEYLESS_ACCESS_ID }}'
