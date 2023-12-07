@@ -105,8 +105,10 @@ runs:
         $displayName = $dynamicSecret.secret.displayName
 
         # **** OUTPUTS **** #
-        echo "::set-output name=app-id::$appId"
-        echo "::set-output name=tenant-id::$tenantId"
-        echo "::set-output name=secret-text::$secretText"
-        echo "::set-output name=key-id::$keyId"
-        echo "::set-output name=display-name::$displayName"
+        # Note Pswh env prefix, the docs don't mention this.
+        # https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#example-declaring-outputs-for-composite-actions
+        echo "app-id=$appId" >> $env:GITHUB_OUTPUT
+        echo "tenant-id=$tenantId" >> $env:GITHUB_OUTPUT
+        echo "secret-text=$secretText" >> $env:GITHUB_OUTPUT
+        echo "key-id=$keyId" >> $env:GITHUB_OUTPUT
+        echo "display-name=$displayName" >> $env:GITHUB_OUTPUT
