@@ -1,0 +1,112 @@
+name: 'Akeyless AAD Dynamic Secret'
+description: 'This action conveniently combines multiple steps to fetch only the information you need from the Azure AD dynamic secret.'
+author: 'Lance McCarthy'
+branding:
+  icon: 'unlock'
+  color: 'green'
+inputs:
+  akeyless-secret-path:
+    description: 'The location of the secret in your AAD secret in the Akeyless vault (ex. /path-to/my-secret)'
+    required: true
+    default: ''
+  akeyless-access-id:
+    description: 'the Akeyless access ID (ex. p-123456, found in Users & Auth Methods portal)'
+    required: true
+    default: ''
+  akeyless-access-key:
+    description: 'The API access key, visit https://docs.akeyless.io/docs/api-key for more info.'
+    required: true
+    default: ''
+  vault-url:
+    description: 'This value overrides the default vault root URL.'
+    required: false
+    default: 'https://api.akeyless.io'
+outputs:
+  app-id:
+    description: "The value of secret.appId from the AAD dynamic secret."
+    value: ${{ steps.bundle.outputs.app-id }}
+  tenant-id:
+    description: "The value of secret.tenantId from the AAD dynamic secret."
+    value: ${{ steps.bundle.outputs.tenant-id }}
+  secret-text:
+    description: "The value of secret.secretText from the AAD dynamic secret."
+    value: ${{ steps.bundle.outputs.secret-text }}
+  key-id:
+    description: "The value of secret.keyId from the AAD dynamic secret."
+    value: ${{ steps.bundle.outputs.key-id }}
+  display-name:
+    description: "The value of secret.displayName from the AAD dynamic secret."
+    value: ${{ steps.bundle.outputs.display-name }}
+runs:
+  using: "composite"
+  steps:
+    - id: bundle
+      shell: pwsh
+      run: |
+        # **** INPUTS **** #
+        $akeylessSecretPath = "${{ inputs.akeyless-secret-path }}"
+        $akeylessAccessId = "${{ inputs.akeyless-access-id }}"
+        $akeylessAccessKey = "${{ inputs.akeyless-access-key }}"
+        $vaultUrl = "${{ inputs.vault-url }}"
+
+        if ([string]::IsNullOrWhiteSpace($akeylessSecretPath)) {
+            echo 'Missing value for akeyless-secret-path.'
+            echo 'You must define the path to the secret. For example, /path-to/my-secret.'
+            exit 1
+        }
+        
+        if ([string]::IsNullOrWhiteSpace($akeylessAccessId)) {
+            echo 'Missing value for akeyless-access-id.'
+            echo 'You must always have an Akeyless Access ID. See https://docs.akeyless.io/docs/api-key for more information.'
+            exit 1
+        }
+
+        if ([string]::IsNullOrWhiteSpace($akeylessAccessKey)) {
+            echo 'Missing value for akeyless-access-key.'
+            echo 'You must always have an Akeyless Access Key. See https://docs.akeyless.io/docs/api-key for more information.'
+            exit 1
+        }
+
+        # **** OPERATIONS **** #
+
+        $AuthBody = @{
+          "access-id" = "$akeylessAccessId"
+          "access-key" = "$akeylessAccessKey"
+          "access-type" = "access_key"
+         }
+
+        $AuthParameters = @{
+          Method = "POST"
+          Uri =  "$vaultUrl/auth"
+          Body = ($AuthBody | ConvertTo-Json) 
+          ContentType = "application/json"
+        }
+
+        $token = (Invoke-RestMethod @AuthParameters).token
+
+        $SecretBody = @{
+          "name" = "$akeylessSecretPath"
+          "token" = "$token"
+        }
+
+        $SecretParameters = @{
+          Method = "POST"
+          Uri =  "$vaultUrl/get-dynamic-secret-value"
+          Body = ($SecretBody | ConvertTo-Json) 
+          ContentType = "application/json"
+        }
+
+        $dynamicSecret = Invoke-RestMethod @SecretParameters
+
+        $appId = $dynamicSecret.secret.appId
+        $tenantId = $dynamicSecret.secret.tenantId
+        $secretText = $dynamicSecret.secret.secretText
+        $keyId = $dynamicSecret.secret.keyId
+        $displayName = $dynamicSecret.secret.displayName
+
+        # **** OUTPUTS **** #
+        echo "::set-output name=app-id::$appId"
+        echo "::set-output name=tenant-id::$tenantId"
+        echo "::set-output name=secret-text::$secretText"
+        echo "::set-output name=key-id::$keyId"
+        echo "::set-output name=display-name::$displayName"

@@ -1,0 +1,33 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check_success:
+    runs-on: windows-latest
+    name: Check for success
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get AAD Secret
+        id: aad-secret
+        uses: ./
+        with:
+          akeyless-secret-path: '/DevTools/live-azure-ad'
+          akeyless-access-id: '${{ secrets.AKEYLESS_ACCESS_ID }}'
+          akeyless-access-key: '${{ secrets.AKEYLESS_ACCESS_KEY }}'
+
+      - name: Verify Output
+        shell: pwsh
+        run: |
+          echo "${{ steps.aad-secret.outputs.app-id }}"
+          echo "${{ steps.aad-secret.outputs.tenant-id }}"
+          echo "${{ steps.aad-secret.outputs.secret-text }}"
+          echo "${{ steps.aad-secret.outputs.key-id }}"
+          echo "${{ steps.aad-secret.outputs.display-name }}"
+
+          
