@@ -9,7 +9,7 @@ on:
 jobs:
   explicit_api_key_auth:
     runs-on: windows-latest
-    name: Check for success
+    name: Use Explicit API Key Auth
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,9 +33,9 @@ jobs:
 
   implicit_github_jwt_auth:
     runs-on: windows-latest
-    name: Check for success
+    name: Use Implicit GitHub JWT auth
 
-    # This authenticates you with akeyless automatically
+    # Required for JWT authentication
     permissions:
       id-token: write
       contents: read
