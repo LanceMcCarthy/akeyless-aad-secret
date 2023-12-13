@@ -104,6 +104,7 @@ runs:
             exit 1
         }
         
+        Write-Output $AuthBody
         
         $AuthParameters = @{
           Method = "POST"
