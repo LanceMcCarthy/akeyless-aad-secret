@@ -55,27 +55,27 @@ runs:
         $vaultUrl = "${{ inputs.vault-url }}"
 
         if ([string]::IsNullOrWhiteSpace($akeylessSecretPath)) {
-            echo 'Missing value for akeyless-secret-path.'
-            echo 'You must define the path to the secret. For example, /path-to/my-secret.'
-            exit 1
+          echo 'Missing value for akeyless-secret-path.'
+          echo 'You must define the path to the secret. For example, /path-to/my-secret.'
+          exit 1
         }
         
         if ([string]::IsNullOrWhiteSpace($akeylessAccessId)) {
-            echo 'Missing value for akeyless-access-id.'
-            echo 'You must always have an Akeyless Access ID. See https://docs.akeyless.io/docs/api-key for more information.'
-            exit 1
+          echo 'Missing value for akeyless-access-id.'
+          echo 'You must always have an Akeyless Access ID. See https://docs.akeyless.io/docs/api-key for more information.'
+          exit 1
         }
 
         $IsApiKeyAuth = $false
         
         if ([string]::IsNullOrWhiteSpace($akeylessAccessKey)) {
-            $IsApiKeyAuth = $true
+          $IsApiKeyAuth = $true
         }
         
         $IsJwtAuth = $false
 
         if ([string]::IsNullOrWhiteSpace($githubJwtToken)) {
-            $IsJwtAuth = $true
+          $IsJwtAuth = $true
         }
 
 
@@ -87,7 +87,7 @@ runs:
           $AuthBody = @{
           "access-id" = "$akeylessAccessId"
           "access-type" = "jwt"
-          jwt = $githubJwtToken
+          "jwt" = $githubJwtToken
          }
         }
         elseif($IsApiKeyAuth){
@@ -100,8 +100,8 @@ runs:
         }
         else{
           echo 'Missing Authentication Option.'
-            echo 'You must either (A)) set the repo-token for implicit GitHub JWT authentication, or (B) set akeyless-access-key (https://docs.akeyless.io/docs/api-key) for API Key authentication.'
-            exit 1
+          echo 'You must either (A)) set the repo-token for implicit GitHub JWT authentication, or (B) set akeyless-access-key (https://docs.akeyless.io/docs/api-key) for API Key authentication.'
+          exit 1
         }
         
         Write-Output $AuthBody
