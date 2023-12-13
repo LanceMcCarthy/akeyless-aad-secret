@@ -87,7 +87,7 @@ runs:
           $AuthBody = @{
           "access-id" = "$akeylessAccessId"
           "access-type" = "jwt"
-          "jwt" = ${{ env:github_token }}
+          "jwt" = $githubJwtToken
          }
         }
         elseif($IsApiKeyAuth){
