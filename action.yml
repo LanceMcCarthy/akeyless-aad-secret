@@ -68,13 +68,13 @@ runs:
 
         $IsApiKeyAuth = $false
         
-        if ([string]::IsNullOrWhiteSpace($akeylessAccessKey)) {
+        if ([string]::IsNullOrWhiteSpace($akeylessAccessKey) -eq $false) {
           $IsApiKeyAuth = $true
         }
         
         $IsJwtAuth = $false
 
-        if ([string]::IsNullOrWhiteSpace($githubJwtToken)) {
+        if ([string]::IsNullOrWhiteSpace($githubJwtToken) -eq $false) {
           $IsJwtAuth = $true
         }
 
