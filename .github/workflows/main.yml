@@ -50,6 +50,7 @@ jobs:
         with:
           akeyless-secret-path: '/DevTools/live-azure-ad'
           akeyless-access-id: 'p-149l6gayzx05'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify Output
         shell: pwsh
