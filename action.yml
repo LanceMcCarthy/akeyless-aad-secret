@@ -83,7 +83,7 @@ runs:
           $AuthBody = @{
           "access-id" = "$akeylessAccessId"
           "access-type" = "jwt"
-          "jwt" = ${{ secrets.GITHUB_TOKEN }}
+          "jwt" = ${{ github.token }}
          }
         }
         else{
