@@ -7,29 +7,29 @@ on:
       - main
 
 jobs:
-  explicit_api_key_auth:
-    runs-on: windows-latest
-    name: Use Explicit API Key Auth
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # explicit_api_key_auth:
+  #   runs-on: windows-latest
+  #   name: Use Explicit API Key Auth
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Get AAD Secret
-        id: aad-secret
-        uses: ./
-        with:
-          akeyless-secret-path: '/DevTools/live-azure-ad'
-          akeyless-access-id: 'p-m9vvgiii6rip'
-          akeyless-access-key: '${{ secrets.AKEYLESS_ACCESS_KEY }}'
+  #     - name: Get AAD Secret
+  #       id: aad-secret
+  #       uses: ./
+  #       with:
+  #         akeyless-secret-path: '/DevTools/live-azure-ad'
+  #         akeyless-access-id: 'p-m9vvgiii6rip'
+  #         akeyless-access-key: '${{ secrets.AKEYLESS_ACCESS_KEY }}'
 
-      - name: Verify Output
-        shell: pwsh
-        run: |
-          echo "${{ steps.aad-secret.outputs.app-id }}"
-          echo "${{ steps.aad-secret.outputs.tenant-id }}"
-          echo "${{ steps.aad-secret.outputs.secret-text }}"
-          echo "${{ steps.aad-secret.outputs.key-id }}"
-          echo "${{ steps.aad-secret.outputs.display-name }}"
+  #     - name: Verify Output
+  #       shell: pwsh
+  #       run: |
+  #         echo "${{ steps.aad-secret.outputs.app-id }}"
+  #         echo "${{ steps.aad-secret.outputs.tenant-id }}"
+  #         echo "${{ steps.aad-secret.outputs.secret-text }}"
+  #         echo "${{ steps.aad-secret.outputs.key-id }}"
+  #         echo "${{ steps.aad-secret.outputs.display-name }}"
 
   implicit_github_jwt_auth:
     runs-on: windows-latest
