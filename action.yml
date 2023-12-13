@@ -87,8 +87,10 @@ runs:
           $AuthBody = @{
           "access-id" = "$akeylessAccessId"
           "access-type" = "jwt"
-          jwt = $githubJwtToken
+          jwt = ${{ secrets.GITHUB_TOKEN }}
          }
+
+         # ${{ secrets.GITHUB_TOKEN }} or $githubJwtToken
         }
         elseif($IsApiKeyAuth){
           # THIS APPROACH USES API KEY (AKA access_key METHOD)
