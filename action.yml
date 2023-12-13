@@ -61,20 +61,41 @@ runs:
             exit 1
         }
 
+        $IsJwtAuth = $true
+        
         if ([string]::IsNullOrWhiteSpace($akeylessAccessKey)) {
-            echo 'Missing value for akeyless-access-key.'
-            echo 'You must always have an Akeyless Access Key. See https://docs.akeyless.io/docs/api-key for more information.'
-            exit 1
+            # echo 'Missing value for akeyless-access-key.'
+            # echo 'You must always have an Akeyless Access Key. See https://docs.akeyless.io/docs/api-key for more information.'
+            # exit 1
+
+            $IsJwtAuth = $true
+        }
+        else{
+            $IsJwtAuth = $false
         }
 
         # **** OPERATIONS **** #
 
-        $AuthBody = @{
+        # Here we check if the user passed in an access-key or not
+
+        if($IsJwtAuth){
+          # NEW FEATURE - THIS APPROACH USES GITHUB JWT AUTH
+          $AuthBody = @{
+          "access-id" = "$akeylessAccessId"
+          "access-type" = "jwt"
+          "jwt" = ${{ secrets.GITHUB_TOKEN }}
+         }
+        }
+        else{
+          # THIS APPROACH USES API KEY (AKA access_key METHOD)
+          $AuthBody = @{
           "access-id" = "$akeylessAccessId"
           "access-key" = "$akeylessAccessKey"
           "access-type" = "access_key"
          }
-
+        }
+        
+        
         $AuthParameters = @{
           Method = "POST"
           Uri =  "$vaultUrl/auth"
