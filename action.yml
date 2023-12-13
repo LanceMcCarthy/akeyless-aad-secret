@@ -89,8 +89,6 @@ runs:
           "access-type" = "jwt"
           jwt = ${{ env.GITHUB_TOKEN }}
          }
-
-         # ${{ secrets.GITHUB_TOKEN }} or $githubJwtToken
         }
         elseif($IsApiKeyAuth){
           # THIS APPROACH USES API KEY (AKA access_key METHOD)
