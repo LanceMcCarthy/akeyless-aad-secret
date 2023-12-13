@@ -15,8 +15,12 @@ inputs:
     default: ''
   akeyless-access-key:
     description: 'The API access key, visit https://docs.akeyless.io/docs/api-key for more info.'
-    required: true
+    required: false
     default: ''
+  repo-token:
+    description: 'This is required when using JWT authentication method'
+    required: false
+    default: 'https://api.akeyless.io'
   vault-url:
     description: 'This value overrides the default vault root URL.'
     required: false
@@ -47,6 +51,7 @@ runs:
         $akeylessSecretPath = "${{ inputs.akeyless-secret-path }}"
         $akeylessAccessId = "${{ inputs.akeyless-access-id }}"
         $akeylessAccessKey = "${{ inputs.akeyless-access-key }}"
+        $githubJwtToken = "${{ inputs.repo-token }}"
         $vaultUrl = "${{ inputs.vault-url }}"
 
         if ([string]::IsNullOrWhiteSpace($akeylessSecretPath)) {
@@ -61,38 +66,42 @@ runs:
             exit 1
         }
 
-        $IsJwtAuth = $true
+        $IsApiKeyAuth = $false
         
         if ([string]::IsNullOrWhiteSpace($akeylessAccessKey)) {
-            # echo 'Missing value for akeyless-access-key.'
-            # echo 'You must always have an Akeyless Access Key. See https://docs.akeyless.io/docs/api-key for more information.'
-            # exit 1
+            $IsApiKeyAuth = $true
+        }
+        
+        $IsJwtAuth = $false
 
+        if ([string]::IsNullOrWhiteSpace($githubJwtToken)) {
             $IsJwtAuth = $true
         }
-        else{
-            $IsJwtAuth = $false
-        }
+
 
         # **** OPERATIONS **** #
 
-        # Here we check if the user passed in an access-key or not
+        $AuthBody = ""
 
         if($IsJwtAuth){
-          # NEW FEATURE - THIS APPROACH USES GITHUB JWT AUTH
           $AuthBody = @{
           "access-id" = "$akeylessAccessId"
           "access-type" = "jwt"
-          "jwt" = ${{ github.token }}
+          "jwt" = ${{ env:github_token }}
          }
         }
-        else{
+        elseif($IsApiKeyAuth){
           # THIS APPROACH USES API KEY (AKA access_key METHOD)
           $AuthBody = @{
           "access-id" = "$akeylessAccessId"
           "access-key" = "$akeylessAccessKey"
           "access-type" = "access_key"
          }
+        }
+        else{
+          echo 'Missing Authentication Option.'
+            echo 'You must either (A)) set the repo-token for implicit GitHub JWT authentication, or (B) set akeyless-access-key (https://docs.akeyless.io/docs/api-key) for API Key authentication.'
+            exit 1
         }
         
         
