@@ -84,6 +84,7 @@ runs:
         $AuthBody = ""
 
         if($IsJwtAuth){
+          # THIS APPROACH USES GITHUB AUTHENTICATION (using 'jwt' access type)
           $AuthBody = @{
           "access-id" = "$akeylessAccessId"
           "access-type" = "jwt"
@@ -91,7 +92,7 @@ runs:
          }
         }
         elseif($IsApiKeyAuth){
-          # THIS APPROACH USES API KEY (AKA access_key METHOD)
+          # THIS APPROACH USES API KEY (using 'access_key' access type)
           $AuthBody = @{
           "access-id" = "$akeylessAccessId"
           "access-key" = "$akeylessAccessKey"
