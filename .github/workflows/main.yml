@@ -7,9 +7,9 @@ on:
       - main
 
 jobs:
-  # explicit_api_key_auth:
+  # api_key_approach:
   #   runs-on: windows-latest
-  #   name: Use Explicit API Key Auth
+  #   name: API Key Authentication Example
   #   steps:
   #     - name: Checkout
   #       uses: actions/checkout@v3
@@ -31,9 +31,9 @@ jobs:
   #         echo "${{ steps.aad-secret.outputs.key-id }}"
   #         echo "${{ steps.aad-secret.outputs.display-name }}"
 
-  implicit_github_jwt_auth:
+  jwt_approach:
     runs-on: windows-latest
-    name: Use Implicit GitHub JWT auth
+    name: JWT Authentication Example
 
     # Required for JWT authentication
     permissions:
