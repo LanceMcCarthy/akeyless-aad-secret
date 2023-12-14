@@ -87,7 +87,7 @@ runs:
           $AuthBody = @{
           "access-id" = "$akeylessAccessId"
           "access-type" = "jwt"
-          jwt = $githubJwtToken
+          "jwt" = $githubJwtToken
          }
         }
         elseif($IsApiKeyAuth){
@@ -100,7 +100,7 @@ runs:
         }
         else{
           echo 'Missing Authentication Option.'
-          echo 'You must either (A)) set the repo-token for implicit GitHub JWT authentication, or (B) set akeyless-access-key (https://docs.akeyless.io/docs/api-key) for API Key authentication.'
+          echo 'You must either (A) set the "repo-token" input to use GitHub JWT authentication, or (B) set "akeyless-access-key" input to use API Key authentication.'
           exit 1
         }
         
