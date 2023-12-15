@@ -7,29 +7,29 @@ on:
       - main
 
 jobs:
-  # api_key_approach:
-  #   runs-on: windows-latest
-  #   name: API Key Authentication Example
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
+  api_key_approach:
+    runs-on: windows-latest
+    name: API Key Authentication Example
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
-  #     - name: Get AAD Secret
-  #       id: aad-secret
-  #       uses: ./
-  #       with:
-  #         akeyless-secret-path: '/DevTools/live-azure-ad'
-  #         akeyless-access-id: 'p-m9vvgiii6rip'
-  #         akeyless-access-key: '${{ secrets.AKEYLESS_ACCESS_KEY }}'
+      - name: Get AAD Secret
+        id: aad-secret
+        uses: ./
+        with:
+          akeyless-secret-path: '/DevTools/live-azure-ad'
+          akeyless-access-id: 'p-m9vvgiii6rip'
+          akeyless-access-key: '${{ secrets.AKEYLESS_ACCESS_KEY }}'
 
-  #     - name: Verify Output
-  #       shell: pwsh
-  #       run: |
-  #         echo "${{ steps.aad-secret.outputs.app-id }}"
-  #         echo "${{ steps.aad-secret.outputs.tenant-id }}"
-  #         echo "${{ steps.aad-secret.outputs.secret-text }}"
-  #         echo "${{ steps.aad-secret.outputs.key-id }}"
-  #         echo "${{ steps.aad-secret.outputs.display-name }}"
+      - name: Verify Output
+        shell: pwsh
+        run: |
+          echo "${{ steps.aad-secret.outputs.app-id }}"
+          echo "${{ steps.aad-secret.outputs.tenant-id }}"
+          echo "${{ steps.aad-secret.outputs.secret-text }}"
+          echo "${{ steps.aad-secret.outputs.key-id }}"
+          echo "${{ steps.aad-secret.outputs.display-name }}"
 
   jwt_approach:
     runs-on: windows-latest
@@ -44,22 +44,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - run: |
-          echo ${{ secrets.GITHUB_TOKEN }}
-        
-      # - name: Get AAD Secret
-      #   id: aad-secret
-      #   uses: ./
-      #   with:
-      #     akeyless-secret-path: '/DevTools/live-azure-ad'
-      #     akeyless-access-id: 'p-149l6gayzx05'
-      #     repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get AAD Secret
+        id: aad-secret
+        uses: ./
+        with:
+          akeyless-secret-path: '/DevTools/live-azure-ad'
+          akeyless-access-id: 'p-149l6gayzx05'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Verify Output
-      #   shell: pwsh
-      #   run: |
-      #     echo "${{ steps.aad-secret.outputs.app-id }}"
-      #     echo "${{ steps.aad-secret.outputs.tenant-id }}"
-      #     echo "${{ steps.aad-secret.outputs.secret-text }}"
-      #     echo "${{ steps.aad-secret.outputs.key-id }}"
-      #     echo "${{ steps.aad-secret.outputs.display-name }}"
+      - name: Verify Output
+        shell: pwsh
+        run: |
+          echo "${{ steps.aad-secret.outputs.app-id }}"
+          echo "${{ steps.aad-secret.outputs.tenant-id }}"
+          echo "${{ steps.aad-secret.outputs.secret-text }}"
+          echo "${{ steps.aad-secret.outputs.key-id }}"
+          echo "${{ steps.aad-secret.outputs.display-name }}"
