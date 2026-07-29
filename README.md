@@ -1,13 +1,16 @@
 # Akeyless Azure AD Dynamic Secret Action
 
-This GitHub Action uses Akeyless REST API to generate and fetch an Azure Active Directory dynamic secret.
+This GitHub Action uses Akeyless REST API to generate and fetch an Azure Active Directory dynamic secret. See 
 
 ## Inputs
 
 - `akeyless-secret-path` (**required**): The location of the secret in your AAD secret in the Akeyless vault (ex. /path-to/my-secret)
 - `akeyless-access-id` (**required**): The Akeyless access ID (ex. p-123456, found in Users & Auth Methods portal)
 - `akeyless-access-key` (**required**): The API access key, visit https://docs.akeyless.io/docs/api-key for more info.
-- `vault-url`: This value overrides the default vault root URL. The default value is https://api.akeyless.io'
+- `vault-url`: This value overrides the default vault root URL. The default value is https://api.akeyless.io.
+
+>[!NOTE]
+> This requires an Akeyless API Key Auth Method. See [Akeyless Prerequisities](#akeyless-prerequisities) for details.
 
 ## Outputs
 
@@ -42,4 +45,38 @@ steps:
       echo "${{ steps.aad-secret.outputs.secret-text }}"
       echo "${{ steps.aad-secret.outputs.key-id }}"
       echo "${{ steps.aad-secret.outputs.display-name }}"
+```
+
+
+
+## Akeyless Prerequisities
+
+Make sure your [API Key Auth Method](https://docs.akeyless.io/docs/auth-with-api-key) is associated with an [Access Role](https://docs.akeyless.io/docs/rbac) that allowed to use the [Azure AD Target](https://docs.akeyless.io/docs/azure-targets). Once aligned, it will be allowed to generate the [Azure AD Dynamic Secrets](https://docs.akeyless.io/docs/azure-ad-dynamic-secrets).
+
+If you want to confirm your details are correct before running this Action in your workflow, choose from one of these options.
+
+### Local Validation - Akeyless CLI
+
+Using the [Akeyless CLI](https://docs.akeyless.io/docs/cli).
+
+1. Log into the CLI using the API Key auth method
+
+```bash
+akeyless configure --access-id "" --access-key "" --access-type access_key
+```
+
+2. Once the CLI is configured, confirm that Accedd ID has permissions to access the 
+
+```bash
+akeyless get-dynamic-secret-value --name "/path/to/entra-dynamic-secret"
+```
+
+If Step 2 works, then you have 100% confidence it will work in this Action, too.
+
+### Local Validation - PowerShell Script
+
+Using the same exact `Get-AkeylessAadSecret.ps1` file this action uses.
+
+```powershell
+.\Get-AkeylessAadSecret.ps1 -AkeylessSecretPath "/entra-id-live"  -AkeylessAccessId "p-nqj9gvov4nyjem" -AkeylessAccessKey "hrYYFJTA6n0WAOk3hfKsnJvgUWoQG6RYxzRi8TJmCc="
 ```
