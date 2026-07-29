@@ -18,17 +18,17 @@ jobs:
         id: aad-secret
         uses: ./
         with:
-          akeyless-secret-path: '/DevTools/live-azure-ad'
-          akeyless-access-id: '${{ secrets.AKEYLESS_ACCESS_ID }}'
-          akeyless-access-key: '${{ secrets.AKEYLESS_ACCESS_KEY }}'
+          akeyless-secret-path: '/entra-id-live'
+          akeyless-access-id: 'p-v53rae47di0jam'
+          akeyless-access-key: '${{secrets.AKEYLESS_ACCESS_KEY}}'
 
       - name: Verify Output
         shell: pwsh
         run: |
-          echo "${{ steps.aad-secret.outputs.app-id }}"
-          echo "${{ steps.aad-secret.outputs.tenant-id }}"
-          echo "${{ steps.aad-secret.outputs.secret-text }}"
-          echo "${{ steps.aad-secret.outputs.key-id }}"
-          echo "${{ steps.aad-secret.outputs.display-name }}"
+          echo "${{steps.aad-secret.outputs.app-id}}"
+          echo "${{steps.aad-secret.outputs.tenant-id}}"
+          echo "${{steps.aad-secret.outputs.secret-text}}"
+          echo "${{steps.aad-secret.outputs.key-id}}"
+          echo "${{steps.aad-secret.outputs.display-name}}"
 
           
