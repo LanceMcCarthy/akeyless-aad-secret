@@ -75,8 +75,19 @@ If Step 2 works, then you have 100% confidence it will work in this Action, too.
 
 ### Local Validation - PowerShell Script
 
-Using the same exact `Get-AkeylessAadSecret.ps1` file this action uses.
+Using the same exact PowerShell logic this action uses.
 
-```powershell
-.\Get-AkeylessAadSecret.ps1 -AkeylessSecretPath "/entra-id-live"  -AkeylessAccessId "p-nqj9gvov4nyjem" -AkeylessAccessKey "hrYYFJTA6n0WAOk3hfKsnJvgUWoQG6RYxzRi8TJmCc="
+1. Change the working directory 
+
+```pwsh
+cd ./github/testing
+```
+
+2. Invoke the ps1 script with the minimum required parameters.
+
+```pwsh
+./Get-AkeylessAadSecret.ps1 `
+    -AkeylessSecretPath "/entra-id-live" `
+    -AkeylessAccessId "p-nqj9gvov4nyjem" `
+    -AkeylessAccessKey "hrY.....................Cc="
 ```
