@@ -8,7 +8,7 @@ on:
 
 jobs:
   check_success:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     name: Check for success
     steps:
       - name: Checkout
@@ -19,7 +19,7 @@ jobs:
         uses: ./
         with:
           akeyless-secret-path: '/entra-id-live'
-          akeyless-access-id: 'p-v53rae47di0jam'
+          akeyless-access-id: 'p-nqj9gvov4nyjem'
           akeyless-access-key: '${{secrets.AKEYLESS_ACCESS_KEY}}'
 
       - name: Verify Output
