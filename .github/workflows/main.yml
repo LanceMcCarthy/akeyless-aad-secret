@@ -19,8 +19,8 @@ jobs:
         uses: ./
         with:
           akeyless-secret-path: '/entra-id-live'
-          akeyless-access-id: 'p-nqj9gvov4nyjem'
-          akeyless-access-key: '${{secrets.AKEYLESS_ACCESS_KEY}}'
+          akeyless-access-id: 'p-v53rae47di0jam'
+          akeyless-access-key: '${{secrets.AKEYLESS_APIKEY_ACCESS_KEY}}'
 
       - name: Verify Output
         shell: pwsh
