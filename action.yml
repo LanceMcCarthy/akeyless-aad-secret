@@ -42,61 +42,98 @@ runs:
   steps:
     - id: bundle
       shell: pwsh
+      env:
+        AKEYLESS_SECRET_PATH: ${{ inputs.akeyless-secret-path }}
+        AKEYLESS_ACCESS_ID: ${{ inputs.akeyless-access-id }}
+        AKEYLESS_ACCESS_KEY: ${{ inputs.akeyless-access-key }}
+        VAULT_URL: ${{ inputs.vault-url }}
       run: |
         # **** INPUTS **** #
-        $akeylessSecretPath = "${{ inputs.akeyless-secret-path }}"
-        $akeylessAccessId = "${{ inputs.akeyless-access-id }}"
-        $akeylessAccessKey = "${{ inputs.akeyless-access-key }}"
-        $vaultUrl = "${{ inputs.vault-url }}"
+
+        $akeylessSecretPath = $env:AKEYLESS_SECRET_PATH
+        $akeylessAccessId = $env:AKEYLESS_ACCESS_ID
+        $akeylessAccessKey = $env:AKEYLESS_ACCESS_KEY
+        $vaultUrl = $env:VAULT_URL
 
         if ([string]::IsNullOrWhiteSpace($akeylessSecretPath)) {
-            echo 'Missing value for akeyless-secret-path.'
-            echo 'You must define the path to the secret. For example, /path-to/my-secret.'
-            exit 1
+          throw "Input 'akeyless-secret-path' is required. For example, /path-to/my-secret."
         }
         
         if ([string]::IsNullOrWhiteSpace($akeylessAccessId)) {
-            echo 'Missing value for akeyless-access-id.'
-            echo 'You must always have an Akeyless Access ID. See https://docs.akeyless.io/docs/api-key for more information.'
-            exit 1
+          throw "Input 'akeyless-access-id' is required. See https://docs.akeyless.io/docs/api-key for more information."
         }
 
         if ([string]::IsNullOrWhiteSpace($akeylessAccessKey)) {
-            echo 'Missing value for akeyless-access-key.'
-            echo 'You must always have an Akeyless Access Key. See https://docs.akeyless.io/docs/api-key for more information.'
-            exit 1
+          throw "Input 'akeyless-access-key' is required. See https://docs.akeyless.io/docs/api-key for more information."
         }
+
+        $parsedVaultUri = $null
+        if (-not [Uri]::TryCreate($vaultUrl, [UriKind]::Absolute, [ref]$parsedVaultUri) -or $parsedVaultUri.Scheme -ne 'https') {
+          throw "Input 'vault-url' must be an absolute HTTPS URL."
+        }
+
+        $vaultUrl = $parsedVaultUri.AbsoluteUri.TrimEnd('/')
 
         # **** OPERATIONS **** #
 
-        $AuthBody = @{
-          "access-id" = "$akeylessAccessId"
-          "access-key" = "$akeylessAccessKey"
+        $authBody = @{
+          "access-id" = $akeylessAccessId
+          "access-key" = $akeylessAccessKey
           "access-type" = "access_key"
-         }
+        }
 
-        $AuthParameters = @{
+        $authParameters = @{
           Method = "POST"
           Uri =  "$vaultUrl/auth"
-          Body = ($AuthBody | ConvertTo-Json) 
+          Body = ($authBody | ConvertTo-Json)
           ContentType = "application/json"
+          ErrorAction = "Stop"
         }
 
-        $token = (Invoke-RestMethod @AuthParameters).token
+        try {
+          $authResponse = Invoke-RestMethod @authParameters
+        }
+        catch {
+          if ($null -ne $_.Exception.Response.StatusCode) {
+            throw "Akeyless authentication failed with HTTP status $([int]$_.Exception.Response.StatusCode)."
+          }
 
-        $SecretBody = @{
-          "name" = "$akeylessSecretPath"
-          "token" = "$token"
+          throw "Akeyless authentication failed: $($_.Exception.Message)"
         }
 
-        $SecretParameters = @{
+        $token = $authResponse.token
+        if ([string]::IsNullOrWhiteSpace($token)) {
+          throw "Akeyless authentication succeeded but returned no token."
+        }
+
+        $secretBody = @{
+          "name" = $akeylessSecretPath
+          "token" = $token
+        }
+
+        $secretParameters = @{
           Method = "POST"
           Uri =  "$vaultUrl/get-dynamic-secret-value"
-          Body = ($SecretBody | ConvertTo-Json) 
+          Body = ($secretBody | ConvertTo-Json)
           ContentType = "application/json"
+          ErrorAction = "Stop"
         }
 
-        $dynamicSecret = Invoke-RestMethod @SecretParameters
+        try {
+          $dynamicSecret = Invoke-RestMethod @secretParameters
+        }
+        catch {
+          if ($null -ne $_.Exception.Response.StatusCode) {
+            throw "Akeyless dynamic secret retrieval failed with HTTP status $([int]$_.Exception.Response.StatusCode)."
+          }
+          
+          throw "Akeyless dynamic secret retrieval failed: $($_.Exception.Message)"
+        }
+
+        if ($null -eq $dynamicSecret.secret) {
+          Write-Output "::error::Akeyless returned no dynamic secret."
+          throw "Akeyless returned no dynamic secret."
+        }
 
         $appId = $dynamicSecret.secret.appId
         $tenantId = $dynamicSecret.secret.tenantId
@@ -104,9 +141,22 @@ runs:
         $keyId = $dynamicSecret.secret.keyId
         $displayName = $dynamicSecret.secret.displayName
 
+        $requiredOutputs = @{
+          "app-id" = $appId
+          "tenant-id" = $tenantId
+          "secret-text" = $secretText
+          "key-id" = $keyId
+          "display-name" = $displayName
+        }
+
+        foreach ($output in $requiredOutputs.GetEnumerator()) {
+          if ([string]::IsNullOrWhiteSpace($output.Value)) {
+            Write-Output "::warning::Akeyless returned an empty '$($output.Key)' value."
+          }
+        }
+
         # **** OUTPUTS **** #
-        # Note Pswh env prefix, the docs don't mention this.
-        # https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#example-declaring-outputs-for-composite-actions
+
         echo "app-id=$appId" >> $env:GITHUB_OUTPUT
         echo "tenant-id=$tenantId" >> $env:GITHUB_OUTPUT
         echo "secret-text=$secretText" >> $env:GITHUB_OUTPUT
